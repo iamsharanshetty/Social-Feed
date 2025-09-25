@@ -26,7 +26,7 @@ A modern, responsive frontend application for the Social Feed social media platf
 
 ## 🌐 Live Demo
 
-The frontend application is deployed and accessible at: https://symphonious-monstera-982c83.netlify.app/
+The frontend application is deployed and accessible at: https://social-feed-ss.netlify.app
 
 ## 🔧 Setup Instructions
 
@@ -55,3 +55,4 @@ yarn install
 ```bash
 npm run dev
 ```
+
