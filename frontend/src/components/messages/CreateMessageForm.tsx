@@ -1,20 +1,28 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useToast } from '@/hooks/use-toast';
-import { createMessage } from '@/lib/api';
-import { useAuth } from '@/contexts/AuthContext';
-import { MessageSquare } from 'lucide-react';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useToast } from "@/hooks/use-toast";
+import { createMessage } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { MessageSquare } from "lucide-react";
 
 const messageSchema = z.object({
-  messageText: z.string()
-    .min(1, 'Message cannot be empty')
-    .max(255, 'Message cannot be longer than 255 characters'), // Backend limit is 255
+  messageText: z
+    .string()
+    .min(1, "Message cannot be empty")
+    .max(255, "Message cannot be longer than 255 characters"), // Backend limit is 255
 });
 
 type MessageFormValues = z.infer<typeof messageSchema>;
@@ -23,7 +31,9 @@ interface CreateMessageFormProps {
   onMessageCreated: () => void;
 }
 
-export const CreateMessageForm = ({ onMessageCreated }: CreateMessageFormProps) => {
+export const CreateMessageForm = ({
+  onMessageCreated,
+}: CreateMessageFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -31,16 +41,16 @@ export const CreateMessageForm = ({ onMessageCreated }: CreateMessageFormProps) 
   const form = useForm<MessageFormValues>({
     resolver: zodResolver(messageSchema),
     defaultValues: {
-      messageText: '',
+      messageText: "",
     },
   });
 
   const onSubmit = async (values: MessageFormValues) => {
     if (!user) {
       toast({
-        title: 'Authentication Error',
-        description: 'Please log in to create a message.',
-        variant: 'destructive',
+        title: "Authentication Error",
+        description: "Please log in to create a message.",
+        variant: "destructive",
       });
       return;
     }
@@ -48,52 +58,53 @@ export const CreateMessageForm = ({ onMessageCreated }: CreateMessageFormProps) 
     // Check if we have a valid accountId
     if (!user.accountId) {
       toast({
-        title: 'User Error',
-        description: 'Invalid user data. Please log in again.',
-        variant: 'destructive',
+        title: "User Error",
+        description: "Invalid user data. Please log in again.",
+        variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
     try {
-      console.log('Creating message with user:', user);
-      console.log('Message text:', values.messageText);
+      console.log("Creating message with user:", user);
+      console.log("Message text:", values.messageText);
 
       // Send the correct field name that backend expects
       await createMessage({
         messageText: values.messageText.trim(),
         postedBy: user.accountId, // Changed from accountId to postedBy
       });
-      
+
       form.reset();
       onMessageCreated();
-      
+
       toast({
-        title: 'Success',
-        description: 'Your message has been posted!',
+        title: "Success",
+        description: "Your message has been posted!",
       });
     } catch (error) {
-      console.error('Message creation error:', error);
-      
-      let errorMessage = 'Failed to create message. Please try again.';
-      
+      console.error("Message creation error:", error);
+
+      let errorMessage = "Failed to create message. Please try again.";
+
       if (error instanceof Error) {
-        if (error.message.includes('Invalid message data')) {
-          errorMessage = 'Please check your message and try again.';
-        } else if (error.message.includes('400')) {
-          errorMessage = 'Invalid message data. Make sure your message is not empty and not too long.';
-        } else if (error.message.includes('401')) {
-          errorMessage = 'Please log in again to create messages.';
-        } else if (error.message.includes('500')) {
-          errorMessage = 'Server error. Please try again later.';
+        if (error.message.includes("Invalid message data")) {
+          errorMessage = "Please check your message and try again.";
+        } else if (error.message.includes("400")) {
+          errorMessage =
+            "Invalid message data. Make sure your message is not empty and not too long.";
+        } else if (error.message.includes("401")) {
+          errorMessage = "Please log in again to create messages.";
+        } else if (error.message.includes("500")) {
+          errorMessage = "Server error. Please try again later.";
         }
       }
-      
+
       toast({
-        title: 'Failed to post message',
+        title: "Failed to post message",
         description: errorMessage,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -145,8 +156,12 @@ export const CreateMessageForm = ({ onMessageCreated }: CreateMessageFormProps) 
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isLoading || !user.accountId} className="w-full">
-              {isLoading ? 'Posting...' : 'Post Message'}
+            <Button
+              type="submit"
+              disabled={isLoading || !user.accountId}
+              className="w-full"
+            >
+              {isLoading ? "Posting..." : "Post Message"}
             </Button>
           </form>
         </Form>

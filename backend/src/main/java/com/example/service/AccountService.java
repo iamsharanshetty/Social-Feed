@@ -59,4 +59,13 @@ public class AccountService {
     public boolean accountExists(Integer accountId) {
         return accountRepository.findById(accountId).isPresent();
     }
+    
+    /**
+     * Get account by ID
+     * Returns the account if found, null if not found
+     */
+    public Account getAccountById(Integer accountId) {
+        Optional<Account> account = accountRepository.findById(accountId);
+        return account.orElse(null);
+    }
 }

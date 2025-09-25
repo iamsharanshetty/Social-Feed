@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.dto.MessageResponseDTO;
 import com.example.entity.Account;
 import com.example.entity.Message;
 import com.example.service.AccountService;
@@ -8,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
-
 
 @RestController  // Tells Spring this handles web requests
 public class SocialMediaController {
@@ -73,22 +72,22 @@ public class SocialMediaController {
     }
     
     /**
-     * 4. Get All Messages
+     * 4. Get All Messages WITH USERNAMES
      * GET /messages
      */
     @GetMapping("/messages")
-    public ResponseEntity<List<Message>> getAllMessages() {
-        List<Message> messages = messageService.getAllMessages();
+    public ResponseEntity<List<MessageResponseDTO>> getAllMessages() {
+        List<MessageResponseDTO> messages = messageService.getAllMessagesWithUsernames();
         return ResponseEntity.ok(messages);  // Always 200 OK
     }
     
     /**
-     * 5. Get Message by ID
+     * 5. Get Message by ID WITH USERNAME
      * GET /messages/{messageId}
      */
     @GetMapping("/messages/{messageId}")
-    public ResponseEntity<Message> getMessageById(@PathVariable Integer messageId) {
-        Message message = messageService.getMessageById(messageId);
+    public ResponseEntity<MessageResponseDTO> getMessageById(@PathVariable Integer messageId) {
+        MessageResponseDTO message = messageService.getMessageByIdWithUsername(messageId);
         
         if (message != null) {
             return ResponseEntity.ok(message);
@@ -129,12 +128,12 @@ public class SocialMediaController {
     }
     
     /**
-     * 8. Get Messages by User
+     * 8. Get Messages by User WITH USERNAMES
      * GET /accounts/{accountId}/messages
      */
     @GetMapping("/accounts/{accountId}/messages")
-    public ResponseEntity<List<Message>> getMessagesByUser(@PathVariable Integer accountId) {
-        List<Message> messages = messageService.getMessagesByUser(accountId);
+    public ResponseEntity<List<MessageResponseDTO>> getMessagesByUser(@PathVariable Integer accountId) {
+        List<MessageResponseDTO> messages = messageService.getMessagesByUserWithUsernames(accountId);
         return ResponseEntity.ok(messages);  // Always 200 OK
     }
 }

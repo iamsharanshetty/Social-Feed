@@ -1,36 +1,21 @@
-package com.example.entity;
+package com.example.dto;
 
-import javax.persistence.*;
-
-@Entity
-@Table(name = "message")
-public class Message {
-    
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "messageId")
+public class MessageResponseDTO {
     private Integer messageId;
-    
-    @Column(name = "postedBy")
-    private Integer postedBy;  // Foreign key to Account
-    
-    // Add this relationship to fetch user details automatically
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "postedBy", insertable = false, updatable = false)
-    private Account account;
-    
-    @Column(name = "messageText", length = 255)
+    private Integer postedBy;
+    private String username;  // This is what we want to display
     private String messageText;
-    
-    @Column(name = "timePostedEpoch")
     private Long timePostedEpoch;
     
     // Default constructor
-    public Message() {}
+    public MessageResponseDTO() {}
     
-    // Constructor for creating messages
-    public Message(Integer postedBy, String messageText, Long timePostedEpoch) {
+    // Constructor to convert from Message entity
+    public MessageResponseDTO(Integer messageId, Integer postedBy, String username, 
+                             String messageText, Long timePostedEpoch) {
+        this.messageId = messageId;
         this.postedBy = postedBy;
+        this.username = username;
         this.messageText = messageText;
         this.timePostedEpoch = timePostedEpoch;
     }
@@ -52,13 +37,12 @@ public class Message {
         this.postedBy = postedBy;
     }
     
-    // Add getter for account relationship
-    public Account getAccount() {
-        return account;
+    public String getUsername() {
+        return username;
     }
     
-    public void setAccount(Account account) {
-        this.account = account;
+    public void setUsername(String username) {
+        this.username = username;
     }
     
     public String getMessageText() {

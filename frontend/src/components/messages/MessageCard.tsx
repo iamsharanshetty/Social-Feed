@@ -1,18 +1,21 @@
-import { useState } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
-import { Message, updateMessage, deleteMessage } from '@/lib/api';
-import { useAuth } from '@/contexts/AuthContext';
-import { Edit2, Trash2, Save, X, User, Clock } from 'lucide-react';
+import { useState } from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { Message, updateMessage, deleteMessage } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { Edit2, Trash2, Save, X, User, Clock } from "lucide-react";
 
 interface MessageCardProps {
   message: Message;
   onMessageUpdated: () => void;
 }
 
-export const MessageCard = ({ message, onMessageUpdated }: MessageCardProps) => {
+export const MessageCard = ({
+  message,
+  onMessageUpdated,
+}: MessageCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(message.messageText);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,18 +29,18 @@ export const MessageCard = ({ message, onMessageUpdated }: MessageCardProps) => 
   const handleEdit = async () => {
     if (!editText.trim()) {
       toast({
-        title: 'Error',
-        description: 'Message cannot be empty',
-        variant: 'destructive',
+        title: "Error",
+        description: "Message cannot be empty",
+        variant: "destructive",
       });
       return;
     }
 
     if (editText.length > 255) {
       toast({
-        title: 'Error',
-        description: 'Message cannot be longer than 255 characters',
-        variant: 'destructive',
+        title: "Error",
+        description: "Message cannot be longer than 255 characters",
+        variant: "destructive",
       });
       return;
     }
@@ -45,38 +48,40 @@ export const MessageCard = ({ message, onMessageUpdated }: MessageCardProps) => 
     setIsLoading(true);
     try {
       // Backend expects messageId, not id
-      const rowsAffected = await updateMessage(message.messageId, { messageText: editText.trim() });
-      
+      const rowsAffected = await updateMessage(message.messageId, {
+        messageText: editText.trim(),
+      });
+
       if (rowsAffected > 0) {
         setIsEditing(false);
         onMessageUpdated();
         toast({
-          title: 'Success',
-          description: 'Message updated successfully!',
+          title: "Success",
+          description: "Message updated successfully!",
         });
       } else {
         toast({
-          title: 'Error',
-          description: 'Failed to update message. It may have been deleted.',
-          variant: 'destructive',
+          title: "Error",
+          description: "Failed to update message. It may have been deleted.",
+          variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Update message error:', error);
-      let errorMessage = 'An error occurred while updating the message';
-      
+      console.error("Update message error:", error);
+      let errorMessage = "An error occurred while updating the message";
+
       if (error instanceof Error) {
-        if (error.message.includes('400')) {
-          errorMessage = 'Invalid message text or message not found';
+        if (error.message.includes("400")) {
+          errorMessage = "Invalid message text or message not found";
         } else {
           errorMessage = error.message;
         }
       }
-      
+
       toast({
-        title: 'Failed to update message',
+        title: "Failed to update message",
         description: errorMessage,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -84,7 +89,7 @@ export const MessageCard = ({ message, onMessageUpdated }: MessageCardProps) => 
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this message?')) {
+    if (!window.confirm("Are you sure you want to delete this message?")) {
       return;
     }
 
@@ -92,28 +97,29 @@ export const MessageCard = ({ message, onMessageUpdated }: MessageCardProps) => 
     try {
       // Backend expects messageId, not id
       const rowsAffected = await deleteMessage(message.messageId);
-      
+
       // Backend returns 0 if message didn't exist, 1 if deleted
       if (rowsAffected > 0) {
         toast({
-          title: 'Success',
-          description: 'Message deleted successfully!',
+          title: "Success",
+          description: "Message deleted successfully!",
         });
       } else {
         toast({
-          title: 'Info',
-          description: 'Message was already deleted.',
+          title: "Info",
+          description: "Message was already deleted.",
         });
       }
-      
+
       // Refresh the feed regardless to update UI
       onMessageUpdated();
     } catch (error) {
-      console.error('Delete message error:', error);
+      console.error("Delete message error:", error);
       toast({
-        title: 'Failed to delete message',
-        description: error instanceof Error ? error.message : 'An error occurred',
-        variant: 'destructive',
+        title: "Failed to delete message",
+        description:
+          error instanceof Error ? error.message : "An error occurred",
+        variant: "destructive",
       });
     } finally {
       setIsLoading(false);
@@ -129,13 +135,16 @@ export const MessageCard = ({ message, onMessageUpdated }: MessageCardProps) => 
   const formatTimestamp = (epochTime: number) => {
     const date = new Date(epochTime);
     const now = new Date();
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
-    
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60)
+    );
+
     if (diffInMinutes < 1) {
-      return 'Just now';
+      return "Just now";
     } else if (diffInMinutes < 60) {
       return `${diffInMinutes}m ago`;
-    } else if (diffInMinutes < 1440) { // Less than 24 hours
+    } else if (diffInMinutes < 1440) {
+      // Less than 24 hours
       const hours = Math.floor(diffInMinutes / 60);
       return `${hours}h ago`;
     } else {
@@ -151,7 +160,8 @@ export const MessageCard = ({ message, onMessageUpdated }: MessageCardProps) => 
           <div className="flex items-center gap-2">
             <User className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm font-medium">
-              User {message.postedBy}
+              {/* CHANGED: Now displays actual username instead of "User {id}" */}
+              {message.username}
             </span>
             {message.timePostedEpoch && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
